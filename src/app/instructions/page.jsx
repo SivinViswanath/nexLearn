@@ -127,7 +127,7 @@ export default function InstructionsPage() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
         {/* Title */}
         <h1
-          className="text-xl sm:text-2xl font-semibold text-center text-[#5C5C5C] mb-4 sm:mb-6"
+          className="text-xl sm:text-2xl font-semibold text-center text-[#1C3141] mb-4 sm:mb-6"
           style={{ fontFamily: 'Inter, sans-serif' }}
         >
           {instructions?.title}

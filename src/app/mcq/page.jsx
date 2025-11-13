@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
+import { toast } from 'react-toastify';
 import { Loading } from '@/components/ui/Loading';
 import {
   setQuestions,
@@ -11,6 +12,7 @@ import {
   setTimeRemaining,
   submitTest,
   markForReview,
+  setResult,
 } from '@/store/slices/mcqSlice';
 import { mcqApi } from '@/lib/api/mcqApi';
 import { formatTime } from '@/lib/utils';
@@ -63,7 +65,7 @@ export default function MCQPage() {
         }
       } catch (error) {
         console.error('Failed to fetch questions:', error);
-        alert('Failed to load questions. Please try again.');
+        toast.error('Failed to load questions. Please try again.');
         router.push('/instructions');
       } finally {
         setLoading(false);
@@ -86,9 +88,10 @@ export default function MCQPage() {
 
   // Auto-submit when time runs out
   useEffect(() => {
-    if (timeRemaining === 0 && !submitting) {
+    if (timeRemaining === 0 && !submitting && questions.length > 0) {
       handleSubmit();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRemaining]);
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -147,14 +150,27 @@ export default function MCQPage() {
       const result = await mcqApi.submitAnswers(formattedAnswers);
 
       if (result.success) {
+        // Store result in Redux
+        dispatch(
+          setResult({
+            total: result.correct + result.wrong + result.not_attended,
+            correct: result.correct,
+            incorrect: result.wrong,
+            unanswered: result.not_attended,
+            score: result.score,
+            details: result.details,
+            examHistoryId: result.exam_history_id,
+            submittedAt: result.submitted_at,
+          }),
+        );
         dispatch(submitTest());
-        router.push(`/result?id=${result.exam_history_id}`);
+        router.push('/result');
       } else {
         throw new Error('Submission failed');
       }
     } catch (error) {
       console.error('Failed to submit answers:', error);
-      alert('Failed to submit answers. Please try again.');
+      toast.error('Failed to submit answers. Please try again.');
       setSubmitting(false);
     }
   };
@@ -461,36 +477,34 @@ export default function MCQPage() {
                   })}
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs">
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                <div className="flex flex-wrap gap-2 text-[9px] sm:text-[10px]">
+                  <div className="flex items-center gap-1">
                     <div
-                      className="w-3 h-3 sm:w-4 sm:h-4 rounded flex-shrink-0"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded flex-shrink-0"
                       style={{ backgroundColor: '#4CAF50' }}
                     ></div>
                     <span className="text-gray-600">Attended</span>
                   </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1">
                     <div
-                      className="w-3 h-3 sm:w-4 sm:h-4 rounded flex-shrink-0"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded flex-shrink-0"
                       style={{ backgroundColor: '#EE3535' }}
                     ></div>
                     <span className="text-gray-600">Not Attended</span>
                   </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1">
                     <div
-                      className="w-3 h-3 sm:w-4 sm:h-4 rounded flex-shrink-0"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded flex-shrink-0"
                       style={{ backgroundColor: '#800080' }}
                     ></div>
-                    <span className="text-gray-600">Marked For Review</span>
+                    <span className="text-gray-600">Marked</span>
                   </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2">
+                  <div className="flex items-center gap-1">
                     <div
-                      className="w-3 h-3 sm:w-4 sm:h-4 rounded flex-shrink-0"
+                      className="w-2 h-2 sm:w-3 sm:h-3 rounded flex-shrink-0"
                       style={{ backgroundColor: '#4CAF50' }}
                     ></div>
-                    <span className="text-gray-600">
-                      Answered and Marked For Review
-                    </span>
+                    <span className="text-gray-600">Ans & Marked</span>
                   </div>
                 </div>
               </div>

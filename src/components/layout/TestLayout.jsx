@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { logout } from '@/store/slices/authSlice';
 import { Button } from '@/components/ui/Button';
+import { toast } from 'react-toastify';
 
 export default function TestLayout({ children }) {
   const router = useRouter();
@@ -12,6 +13,7 @@ export default function TestLayout({ children }) {
 
   const handleLogout = () => {
     dispatch(logout());
+    toast.success('Logged out successfully!');
     router.push('/login');
   };
 

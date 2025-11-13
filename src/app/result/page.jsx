@@ -1,25 +1,20 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Loading } from '@/components/ui/Loading';
 import { resetTest } from '@/store/slices/mcqSlice';
-import { mcqApi } from '@/lib/api/mcqApi';
-import { calculateScore } from '@/lib/utils';
 import TestLayout from '@/components/layout/TestLayout';
 
 function ResultPageContent() {
   const router = useRouter();
   const dispatch = useDispatch();
   const { isAuthenticated } = useSelector((state) => state.auth);
-  const { questions, answers } = useSelector((state) => state.mcq);
-
-  const [result, setResult] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { result } = useSelector((state) => state.mcq);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -27,25 +22,16 @@ function ResultPageContent() {
       return;
     }
 
-    // Calculate result from local state
-    try {
-      const calculatedResult = calculateScore(answers, questions);
-      setResult(calculatedResult);
-    } catch (error) {
-      console.error('Failed to calculate result:', error);
-    } finally {
-      setLoading(false);
+    // If no result data, redirect to instructions
+    if (!result) {
+      router.push('/instructions');
     }
-  }, [isAuthenticated, router, answers, questions]);
+  }, [isAuthenticated, result, router]);
 
   const handleRetakeTest = () => {
     dispatch(resetTest());
     router.push('/instructions');
   };
-
-  if (loading) {
-    return <Loading fullScreen />;
-  }
 
   if (!result) {
     return (
