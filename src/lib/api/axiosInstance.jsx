@@ -29,6 +29,15 @@ axiosInstance.interceptors.request.use(
 axiosInstance.interceptors.response.use(
   (response) => response,
   async (error) => {
+    // Handle network errors
+    if (!error.response) {
+      console.error('Network error:', error.message);
+      return Promise.reject({
+        message: 'Network error. Please check your internet connection.',
+        isNetworkError: true,
+      });
+    }
+
     // If error is 401, clear tokens and redirect to login
     if (error.response?.status === 401) {
       Cookies.remove('accessToken');
@@ -39,7 +48,17 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    return Promise.reject(error);
+    // Handle other errors
+    const errorMessage =
+      error.response?.data?.message ||
+      error.response?.data?.error ||
+      'An unexpected error occurred';
+
+    return Promise.reject({
+      ...error,
+      message: errorMessage,
+      status: error.response?.status,
+    });
   },
 );
 

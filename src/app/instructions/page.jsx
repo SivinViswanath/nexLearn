@@ -15,6 +15,7 @@ export default function InstructionsPage() {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const [instructions, setInstructions] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -24,6 +25,7 @@ export default function InstructionsPage() {
 
     const fetchInstructions = async () => {
       try {
+        setError(null);
         const data = await mcqApi.getQuestions();
 
         if (data.success) {
@@ -77,6 +79,10 @@ export default function InstructionsPage() {
         }
       } catch (error) {
         console.error('Failed to fetch instructions:', error);
+        setError(
+          error.message || 'Failed to load instructions. Please try again.',
+        );
+        // Set default instructions as fallback
         setInstructions({
           title: 'Ancient Indian History MCQ',
           duration: 90,
@@ -125,6 +131,11 @@ export default function InstructionsPage() {
   return (
     <TestLayout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-8">
+        {error && (
+          <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-yellow-800 text-sm">{error}</p>
+          </div>
+        )}
         {/* Title */}
         <h1
           className="text-xl sm:text-2xl font-semibold text-center text-[#1C3141] mb-4 sm:mb-6"

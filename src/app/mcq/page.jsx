@@ -65,11 +65,17 @@ export default function MCQPage() {
         }
       } catch (error) {
         console.error('Failed to fetch questions:', error);
-        toast.error('Failed to load questions. Please try again.');
-        router.push('/instructions');
-      } finally {
+        const errorMessage =
+          error.message || 'Failed to load questions. Please try again.';
+        toast.error(errorMessage);
         setLoading(false);
+        // Don't redirect immediately, let user see the error
+        setTimeout(() => {
+          router.push('/instructions');
+        }, 2000);
+        return;
       }
+      setLoading(false);
     };
 
     fetchQuestions();
@@ -170,7 +176,9 @@ export default function MCQPage() {
       }
     } catch (error) {
       console.error('Failed to submit answers:', error);
-      toast.error('Failed to submit answers. Please try again.');
+      const errorMessage =
+        error.message || 'Failed to submit answers. Please try again.';
+      toast.error(errorMessage);
       setSubmitting(false);
     }
   };
