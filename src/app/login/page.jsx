@@ -105,6 +105,7 @@ export default function LoginPage() {
 
     setLoading(true);
     setError('');
+    setOtp(''); // Clear OTP field when resending
 
     try {
       const { authApi } = await import('@/lib/api/authApi');
@@ -328,6 +329,7 @@ export default function LoginPage() {
               width: '100%',
               maxWidth: '200px',
               height: '60px',
+              marginBottom: { xs: '20px', md: '60px' },
             }}
           >
             <Image
@@ -365,11 +367,10 @@ export default function LoginPage() {
             padding: { xs: 3, sm: 4, md: 5 },
             display: 'flex',
             flexDirection: 'column',
-            justifyContent: 'space-between',
             minHeight: { xs: '400px', md: '500px' },
           }}
         >
-          <Box>
+          <Box sx={{ display: 'flex', flexDirection: 'column', flex: 1 }}>
             <Typography
               variant="h5"
               sx={{
@@ -402,9 +403,14 @@ export default function LoginPage() {
             {step === 'mobile' && (
               <form
                 onSubmit={handleSendOTP}
-                style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: 1,
+                  minHeight: 0,
+                }}
               >
-                <Box sx={{ flex: 1 }}>
+                <Box>
                   <Box sx={{ mb: 2 }}>
                     {mounted ? (
                       <PhoneInput
@@ -496,9 +502,14 @@ export default function LoginPage() {
             {step === 'otp' && (
               <form
                 onSubmit={handleVerifyOTP}
-                style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: 1,
+                  minHeight: 0,
+                }}
               >
-                <Box sx={{ flex: 1 }}>
+                <Box>
                   <TextField
                     fullWidth
                     label="OTP Code"
@@ -527,14 +538,16 @@ export default function LoginPage() {
                     sx={{ display: 'block', color: '#666' }}
                   >
                     Your 6-digit code expires after 5 minutes. If the code
-                    doesn&apos;t arrive, check your spam folder or{' '}
+                    doesn&apos;t arrive, check your spam folder or <br />
                     <Typography
                       component="span"
                       variant="caption"
                       sx={{
-                        color: '#487EA7',
+                        color: '#1C3141',
                         cursor: 'pointer',
+                        fontWeight: 600,
                         textDecoration: 'underline',
+                        fontSize: '14px',
                       }}
                       onClick={!loading ? handleSendOTP : undefined}
                     >
@@ -572,9 +585,14 @@ export default function LoginPage() {
             {step === 'profile' && (
               <form
                 onSubmit={handleCreateProfile}
-                style={{ display: 'flex', flexDirection: 'column', flex: 1 }}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  flex: 1,
+                  minHeight: 0,
+                }}
               >
-                <Box sx={{ flex: 1 }}>
+                <Box>
                   <Box
                     sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}
                   >
